@@ -17,8 +17,3 @@ async transferOwnership() {
         }
       } 
 ```
-
-## deployContract
-```
-
-```
