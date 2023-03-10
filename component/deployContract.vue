@@ -1,39 +1,173 @@
 <template>
-  <el-form :model="formData" ref="vForm" :rules="rules" label-position="left" label-width="75px"
-    size="default" @submit.prevent>
-    <el-form-item label="代币名称" prop="input84916" class="label-center-align">
+  <el-form :model="formData" ref="vForm" :rules="rules" label-position="top" label-width="80px" size="default"
+    @submit.prevent>
+    <el-form-item label="代币名称" prop="input84916" class="label-right-align">
       <el-input v-model="formData.input84916" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币简称" prop="input3108" class="label-center-align">
+    <el-form-item label="代币简称" prop="input3108" class="label-right-align">
       <el-input v-model="formData.input3108" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币精度" prop="input77472" class="label-center-align">
-      <el-input v-model="formData.input77472" type="text" placeholder="代币精度一般使用18" clearable></el-input>
+    <el-form-item label="代币精度" prop="input77472" class="label-right-align">
+      <el-input v-model="formData.input77472" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币总量" prop="input34416" class="label-center-align">
+    <el-form-item label="代币总量" prop="input34416" class="label-right-align">
       <el-input v-model="formData.input34416" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="选择模板" prop="select85272">
-      <el-select v-model="formData.select85272" class="full-width-input" clearable>
-        <el-option v-for="(item, index) in select85272Options" :key="index" :label="item.label"
+    <el-form-item label="选择模板" prop="select39851">
+      <el-select v-model="formData.select39851" class="full-width-input">
+        <el-option v-for="(item, index) in select39851Options" :key="index" :label="item.label"
           :value="item.value" :disabled="item.disabled"></el-option>
       </el-select>
     </el-form-item>
-    <div class="static-content-item">
-      <el-button type="primary" @click="submitForm">创建代币</el-button>
-    </div>
+    <el-form v-if="displayForm">
+      <el-form v-if="displayDivident">
+        <el-form-item label="最低分红标准：用户持有代币数量超过该值, 才会进行分红, 该值创建代币后无法修改" prop="input54591"
+          class="label-right-align">
+          <el-input v-model="formData.input54591" type="text" clearable></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form v-if="displayDividentToken">
+        <el-form-item label="分红代币" prop="select24237" class="label-right-align">
+          <el-select v-model="formData.select24237" class="full-width-input" clearable>
+            <el-option v-for="(item, index) in select24237Options" :key="index" :label="item.label"
+              :value="item.value" :disabled="item.disabled"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </el-form>
+
+    <!--控制显示-->
+    <el-form v-if="displayForm">
+      <div class="static-content-item">
+        <div>买入税率:</div>
+      </div>
+      <el-row>
+        <el-col :span="12" class="grid-cell">
+          <el-row>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="回流税率" prop="input50891" class="label-right-align">
+                <el-input v-model="formData.input50891" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="营销税率" prop="input89583" class="label-right-align">
+                <el-input v-model="formData.input89583" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="12" class="grid-cell">
+          <el-row>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="销毁税率" prop="input77801" class="label-right-align">
+                <el-input v-model="formData.input77801" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="分红税率" prop="input74986" class="label-right-align">
+                <el-input v-model="formData.input74986" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+      <div class="static-content-item">
+        <div>卖出税率</div>
+      </div>
+      <el-row>
+        <el-col :span="12" class="grid-cell">
+          <el-row>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="回流税率" prop="input35822" class="label-right-align">
+                <el-input v-model="formData.input35822" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="营销税率" prop="input52556" class="label-right-align">
+                <el-input v-model="formData.input52556" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="12" class="grid-cell">
+          <el-row>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="销毁税率" prop="input25672" class="label-right-align">
+                <el-input v-model="formData.input25672" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" class="grid-cell">
+              <el-form-item label="分红税率" prop="input101223" class="label-right-align">
+                <el-input v-model="formData.input101223" type="text" clearable></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+
+      <el-form v-if="displayFund">
+        <el-form-item label="营销钱包：营销税将会自动转移到此钱包中, 请务必保存好私钥" prop="input106699" class="label-right-align">
+          <el-input v-model="formData.input106699" type="text" clearable></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form-item label="选择底池：添加流动性时需要添加代币与底池代币之间的交易对, 否则无法进行正常分红与回流" prop="select72992">
+        <el-select v-model="formData.select72992" class="full-width-input" clearable placeholder="请选择">
+          <el-option v-for="(item, index) in select72992Options" :key="index" :label="item.label"
+            :value="item.value" :disabled="item.disabled"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="选择交易所" prop="select37418" class="label-right-align">
+        <el-select v-model="formData.select37418" class="full-width-input" clearable>
+          <el-option v-for="(item, index) in select37418Options" :key="index" :label="item.label"
+            :value="item.value" :disabled="item.disabled"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="手动开启交易：添加池子后的首次交易需要在控制台手动开启(如关闭, 则添加流动性后立即可以进行交易), 交易开启后无法关闭" prop="switch16694">
+        <el-switch v-model="formData.switch16694"></el-switch>
+      </el-form-item>
+      <el-form-item label="杀区块：将对开启交易后在n个区块内交易的地址全部拉入黑名单, 用于防止机器人抢跑买入, 必须手动开启交易" prop="switch22379"
+        class="label-right-align">
+        <el-switch v-model="formData.switch22379"></el-switch>
+      </el-form-item>
+      <el-form-item label="税率开关：可在创建代币后手动调整税率, 买卖税率各不能超过25%, 此开关关闭后无法再次开启" prop="switch19287"
+        class="label-right-align">
+        <el-switch v-model="formData.switch19287"></el-switch>
+      </el-form-item>
+      <el-form-item label="转账扣费开关：开启开关后, 用户向其他地址转移代币时, 将以卖出税作为转账税率, 关闭此开关, 则转账不扣税" prop="switch38297"
+        class="label-right-align">
+        <el-switch v-model="formData.switch38297"></el-switch>
+      </el-form-item>
+      <el-form-item label="地址裂变：开启开关后, 用户交易时, 将会自动向随机地址空投小额代币, 以增加持币地址" prop="switch77035"
+        class="label-right-align">
+        <el-switch v-model="formData.switch77035"></el-switch>
+      </el-form-item>
+      <el-form-item label="黑名单功能：可拉黑部分钱包地址令其无法交易, 此开关关闭后无法再次开启" prop="switch62669" class="label-right-align">
+        <el-switch v-model="formData.switch62669"></el-switch>
+      </el-form-item>
+      <el-form-item label="限制交易：可设置单次交易的最大交易数量, 此开关关闭后无法再次开启" prop="switch117946" class="label-right-align">
+        <el-switch v-model="formData.switch117946"></el-switch>
+      </el-form-item>
+      <el-form-item label="限制最大持币量：可设置单个钱包持有的最大代币数量, 此开关关闭后无法再次开启" prop="switch76742" class="label-right-align">
+        <el-switch v-model="formData.switch76742"></el-switch>
+      </el-form-item>
+    </el-form>
+
+          <div class="static-content-item">
+        <el-button type="primary">创建代币</el-button>
+      </div>
   </el-form>
 </template>
 
 <script>
   import {
     defineComponent,
+    ref,
     toRefs,
+    watch,
     reactive,
     getCurrentInstance
-  } 
+  }
   from 'vue'
-  import Web3 from 'web3'
   export default defineComponent({
     components: {},
     props: {},
@@ -44,25 +178,35 @@
           input3108: "",
           input77472: "",
           input34416: "",
-          select85272: "",
+          select39851: 1,
+          input54591: "",
+          select24237: "",
+          input50891: "",
+          input89583: "",
+          input77801: "",
+          input74986: "",
+          input35822: "",
+          input52556: "",
+          input25672: "",
+          input101223: "",
+          input106699: "",
+          select72992: "",
+          select37418: "",
+          switch16694: false,
+          switch22379: false,
+          switch19287: false,
+          switch38297: null,
+          switch77035: null,
+          switch62669: null,
+          switch117946: null,
+          switch76742: null,
         },
-        rules: {
-          input34416: [{
-            pattern: /^\d+(\.\d+)?$/,
-            trigger: ['blur', 'change'],
-            message: ''
-          }],
-          input77472: [{
-            pattern: /^\d+(\.\d+)?$/,
-            trigger: ['blur', 'change'],
-            message: ''
-          }],
-        },
-        select85272Options: [{
+        rules: {},
+        select39851Options: [{
           "label": "无税通用模板",
           "value": 1
         }, {
-          "label": "无有税通用模板",
+          "label": "有税通用模板",
           "value": 2
         }, {
           "label": "持币分红模板",
@@ -71,101 +215,79 @@
           "value": 4,
           "label": "加池分红模板"
         }],
+        select24237Options: [{
+          "label": "BNB",
+          "value": 1
+        }, {
+          "label": "BUSD",
+          "value": 2
+        }, {
+          "label": "CAKE",
+          "value": 3
+        }],
+        select72992Options: [{
+          "label": "BNB",
+          "value": 1
+        }, {
+          "label": "USDT",
+          "value": 2
+        }],
+        select37418Options: [{
+          "label": "Pancakeswap",
+          "value": 1
+        }],
       })
+      
+      const displayForm = ref(false);
+      const displayDivident = ref(false);
+      const displayDividentToken = ref(false);
+      const displayFund = ref(false);
+      watch(() =>state.formData.select39851, (newValue, oldValue) => {
+        console.log(newValue, oldValue);
+        if (newValue != oldValue && newValue == '2') {
+          displayForm.value = true;
+          displayDivident.value = false;
+          displayDividentToken.value = false;
+          displayFund.value = false;
+        } else if (newValue != oldValue && newValue == '3') {
+          displayForm.value = true;
+          displayDivident.value = true;
+          displayDividentToken.value = true;
+          displayFund.value = false;
+        } else if (newValue != oldValue && newValue == '4') {
+          displayForm.value = true;
+          displayDivident.value = false;
+          displayDividentToken.value = true;
+          displayFund.value = true;
+        } else {
+          displayForm.value = false;
+          displayDivident.value = false;
+          displayDividentToken.value = false;
+          displayFund.value = false;
+        }
+      });
 
       const instance = getCurrentInstance()
-
-
       const submitForm = () => {
-        instance.ctx.$refs['vForm'].validate(async (valid) => {
+        instance.ctx.$refs['vForm'].validate(valid => {
           if (!valid) return
-
           //TODO: 提交表单
-          if (typeof window.ethereum !== 'undefined') {
-            try {
-              // 请求用户授权
-              await window.ethereum.request({ method: 'eth_requestAccounts' });
-              // 用户已授权访问账户，执行相关操作
-            } catch (error) {
-              // 用户未授权访问账户
-              console.error(error);
-            }
-          }
-          
-            if (window.web3) {
-              window.web3 = new Web3(window.web3.currentProvider);
-            } else {
-              window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
-            }
-
-
-            const web3 = window.web3;
-            const accounts = await web3.eth.getAccounts();
-            const abi = [
-                  {
-                    "inputs": [],
-                    "name": "get",
-                    "outputs": [
-                      {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                      }
-                    ],
-                    "stateMutability": "view",
-                    "type": "function"
-                  }
-            ];
-            const bytecode = '608060405234801561001057600080fd5b5060b68061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80636d4ce63c14602d575b600080fd5b60336047565b604051603e91906067565b60405180910390f35b60006001905090565b6000819050919050565b6061816050565b82525050565b6000602082019050607a6000830184605a565b9291505056fea2646970667358221220f88616454f52e0d0f116ceac48732d3b0accaa91e57ab00f9a35440b3d3e7c8664736f6c63430008120033'
-            const contract = new web3.eth.Contract(abi);
-            const deployedContract = await contract.deploy({
-              data: bytecode,
-              arguments: []
-            }).send({
-              from: accounts[0],
-              gas: '5000000',
-            }, (error, transactionHash) => {
-              if (error) {
-                console.error(error);
-              } else {
-                console.log(transactionHash);
-              }
-            })
-
-
-            // 在区块链浏览器中验证
-            const sourceCode = await web3.eth.getCode(deployedContract.options.address);
-            const data = {
-              apikey: 'CIFMXUC696VIJ1RZ3FERDUK3YKVT88JWKP',
-              module: 'contract',
-              action: 'verifysourcecode',
-              contractaddress: deployedContract.options.address,
-              sourceCode: sourceCode,
-            };
-            console.log(data)
-            const url = 'https://api-testnet.bscscan.com'
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(data)
-            });
-            const jsonResp = await response
-            console.log(jsonResp);
-            return jsonResp;
-      })
+        })
+      }
+      const resetForm = () => {
+        instance.ctx.$refs['vForm'].resetFields()
+      }
+      return {
+        ...toRefs(state),
+        displayForm,
+        displayDivident,
+        displayDividentToken,
+        displayFund,
+        submitForm,
+        resetForm
+      }
     }
-    const resetForm = () => {
-      instance.ctx.$refs['vForm'].resetFields()
-    }
-    return {
-      ...toRefs(state),
-      submitForm,
-      resetForm,
-    }
-  }
-})
+  })
   
 </script>
 
