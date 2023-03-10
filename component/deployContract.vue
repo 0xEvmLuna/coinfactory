@@ -168,6 +168,18 @@
     getCurrentInstance
   }
   from 'vue'
+
+  import { 
+    supportedChainIds,
+    templateA_bytecode,
+    TemplateA_ABI,
+    templateB_bytecode,
+    TemplateB_ABI,
+    templateC_bytecode,
+    TemplateC_ABI,
+    templateD_bytecode,
+    TemplateD_ABI,
+  } from '@/utils/chain'
   export default defineComponent({
     components: {},
     props: {},
@@ -242,6 +254,8 @@
       const displayDivident = ref(false);
       const displayDividentToken = ref(false);
       const displayFund = ref(false);
+
+      //监听下拉框弹出窗口
       watch(() =>state.formData.select39851, (newValue, oldValue) => {
         console.log(newValue, oldValue);
         if (newValue != oldValue && newValue == '2') {
@@ -271,12 +285,126 @@
       const submitForm = () => {
         instance.ctx.$refs['vForm'].validate(valid => {
           if (!valid) return
+          // token信息
+          // 名称
+          const name = state.formData.input84916;
+          // 简称
+          const symbol = state.formData.input3108;
+          // 精度
+          const decimal = state.formData.input77472;
+          // 供应
+          const supply = state.formData.input34416;
+          // 模板类型
+          const isTemplates = state.formData.select39851;
+          // 最低分红标准
+          const minDivident = state.formData.input54591;
+          // 分红代币
+          const dividentToken = state.formData.select24237;
+          /** 买入税率 */
+          // 回流税率
+          const buyLpFee = state.formData.input50891;
+          // 营销税率
+          const buyFundFee = state.formData.input89583;
+          // 销毁税率
+          const buyBurnFee = state.formData.input77801;
+          // 分红税率
+          const buyDividentFee = state.formData.input74986;
+
+          /** 卖出税率 */
+          // 回流税率
+          const sellLpFee = state.formData.input35822;
+          // 营销税率
+          const sellFundFee = state.formData.input52556;
+          // 销毁税率
+          const sellBurnFee = state.formData.input25672;
+          // 分红税率
+          const sellDividentFee = state.formData.input101223;      
+          
+          // 营销钱包
+          const fundAddress = state.formData.input106699;
+          // 选择底池
+          const lpPool = state.formData.select72992;
+          // 选择交易所
+          const exchange = state.formData.select37418;
+          // 手动开启交易
+          const startTrade = state.formData.switch16694;
+          // 杀区块
+          const killBlock = state.formData.switch22379;
+          // 税率开关
+          const startFee = state.formData.switch19287;
+          // 转账扣费
+          const txFee = state.formData.switch38297;
+          // 地址裂变
+          const fission = state.formData.switch77035;
+          // 黑名单功能
+          const blackList = state.formData.switch62669;
+          // 限制交易
+          const txLimit = state.formData.switch117946;
+          // 限制最大持币量
+          const maxWalletLimit = state.formData.switch76742;
+
           //TODO: 提交表单
+          // 判断是否连接MetaMask
+          if (typeof window.ethereum !== 'undefined') {
+            try {
+              // 请求用户授权
+              await window.ethereum.request({ method: 'eth_requestAccounts' });
+              // 用户已授权访问账户，执行相关操作
+            } catch (error) {
+              // 用户未授权访问账户
+              console.error(error);
+            }
+          }
+          if (window.web3) {
+              window.web3 = new Web3(window.web3.currentProvider);
+            } else {
+              window.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+          }
+
+          // 初始化实例
+          const web3 = window.web3;
+          // 获取当前账户
+          const accounts = await web3.eth.getAccounts();
+          // 获取当前钱包的链ID，判断是否支持该链
+          const chainId = await web3.eth.getChainId();
+          console.log("chainId",chainId);
+          if (!supportedChainIds.includes(chainId)) {
+            throw new Error(`Metamask is connected to an unsupported network. Please switch to a supported network: ${supportedChainIds.join(', ')}.`);
+          }
+
+          if (isTemplates == 1) {
+            const abi = TemplateA_ABI;
+            const bytecode = templateA_bytecode;
+            const contract = new web3.eth.Contract(abi);
+            const deployedContract = await contract.deploy({
+              data: bytecode,
+              arguments: [],
+            }).send({
+                from: accounts[0],
+                gas: '5000000',
+              }, (error, transactionHash) => {
+                if (error) {
+                  console.error(error);
+                } else {
+                  console.log(transactionHash);
+                }
+              })
+          } else if (isTemplates == 2) {
+
+          } else if (isTemplates == 3) {
+
+          } else if (isTemplates == 4) {
+            
+          }
+
+
+
+
+
+
         })
       }
-      const resetForm = () => {
-        instance.ctx.$refs['vForm'].resetFields()
-      }
+
       return {
         ...toRefs(state),
         displayForm,
