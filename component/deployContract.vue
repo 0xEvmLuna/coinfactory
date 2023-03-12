@@ -1,16 +1,16 @@
 <template>
   <el-form :model="formData" ref="vForm" :rules="rules" label-position="top" label-width="80px" size="default"
     @submit.prevent>
-    <el-form-item label="代币名称" prop="input84916" class="label-right-align">
+    <el-form-item label="代币名称" prop="input84916" class="required label-right-align">
       <el-input v-model="formData.input84916" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币简称" prop="input3108" class="label-right-align">
+    <el-form-item label="代币简称" prop="input3108" class="required label-right-align">
       <el-input v-model="formData.input3108" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币精度" prop="input77472" class="label-right-align">
+    <el-form-item label="代币精度" prop="input77472" class="required label-right-align">
       <el-input v-model="formData.input77472" type="text" clearable></el-input>
     </el-form-item>
-    <el-form-item label="代币总量" prop="input34416" class="label-right-align">
+    <el-form-item label="代币总量" prop="input34416" class="required label-right-align">
       <el-input v-model="formData.input34416" type="text" clearable></el-input>
     </el-form-item>
     <el-form-item label="选择模板" prop="select39851">
@@ -253,7 +253,32 @@
           switch76742: null,
           input101367: "",
         },
-        rules: {},
+        rules: {
+          input84916: [{
+            required: true,
+            message: '代币名称不能为空',
+          }],
+          input3108: [{
+            required: true,
+            message: '代币简称不能为空',
+          }],
+          input77472: [{
+            required: true,
+            message: '代币精度不能为空',
+          }, {
+            pattern: /^\d+(\.\d+)?$/,
+            trigger: ['blur', 'change'],
+            message: '精度只能为数字'
+          }],
+          input34416: [{
+            required: true,
+            message: '代币总量不能为空',
+          }, {
+            pattern: /^\d+(\.\d+)?$/,
+            trigger: ['blur', 'change'],
+            message: '总量只能为数字'
+          }],
+        },
         select39851Options: [{
           "label": "无税通用模板",
           "value": 1
@@ -433,7 +458,7 @@
             }).send({
                 from: accounts[0],
                 gas: '5000000',
-                gasPrice: web3.utils.toWei('20', 'gwei'),
+                gasPrice: web3.utils.toWei('8', 'gwei'),
               }, (error, transactionHash) => {
                 if (error) {
                   console.error(error);
