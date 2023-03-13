@@ -473,8 +473,7 @@
                 [],
             ];
             const encodedArgs = web3.eth.abi.encodeParameters(['string[]', 'address[]', 'uint256[]', 'bool[]'], constructorArgs);
-
-
+            // 部署合约
             const deployedContract = await contract.deploy({
               data: bytecode,
               arguments: constructorArgs,
@@ -518,11 +517,26 @@
             });
             const resp = await response.json();
             console.log(resp.result);
+
+            
           } else if (isTemplates == 2) {
             console.log("prepare deploy", isTemplates)
             const abi = TemplateB_ABI;
             const bytecode = templateB_bytecode;
             const contract = new web3.eth.Contract(abi);
+            
+            const estimatedGas = contract.deploy({
+              data: bytecode,
+              arguments: [
+                [name, symbol],
+                [],
+                [web3.utils.toBN(parseInt(decimal)), precision],
+                [],
+              ],
+            }).estimateGas();
+            const gasPrice = await web3.eth.getGasPrice();
+            const finalGas = Math.floor(estimatedGas * 1.2); // 增加一个因子
+            
             const deployedContract = await contract.deploy({
               data: bytecode,
               arguments: [
