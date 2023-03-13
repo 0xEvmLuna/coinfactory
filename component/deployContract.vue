@@ -214,8 +214,8 @@
     templateD_bytecode,
     TemplateD_ABI,
   } from '@/utils/chain'
-
   import Web3 from 'web3'
+
   export default defineComponent({
     components: {},
     props: {},
@@ -427,6 +427,7 @@
               console.error(error);
             }
           }
+
           if (window.web3) {
               window.web3 = new Web3(window.web3.currentProvider);
             } else {
@@ -442,51 +443,81 @@
           if (!supportedChainIds.includes(chainId)) {
             throw new Error(`Metamask is connected to an unsupported network. Please switch to a supported network: ${supportedChainIds.join(', ')}.`);
           }
+
           if (isTemplates == 1) {
             console.log("prepare deploy", isTemplates)
             const abi = TemplateA_ABI;
             const bytecode = templateA_bytecode;
             const contract = new web3.eth.Contract(abi);
-            const deployedContract = await contract.deploy({
+            const supplyInWei = web3.utils.toBN(supply);
+            // 计算 10 的 decimals 次方，即代币的精度
+            const precision = web3.utils.toBN(10).pow(web3.utils.toBN(parseInt(decimal)));
+
+            const estimatedGas = contract.deploy({
               data: bytecode,
               arguments: [
                 [name, symbol],
                 [],
-                [web3.utils.toBN(decimal), web3.utils.toBN(supply)],
+                [web3.utils.toBN(parseInt(decimal)), precision],
                 [],
               ],
+            }).estimateGas();
+            const gasPrice = await web3.eth.getGasPrice();
+            const finalGas = Math.floor(estimatedGas * 1.2); // 增加一个因子
+            
+            // 打包初始化参数
+            const constructorArgs = [
+                [name, symbol],
+                [],
+                [web3.utils.toBN(decimal), web3.utils.toWei(supply, "ether")],
+                [],
+            ];
+            const encodedArgs = web3.eth.abi.encodeParameters(['string[]', 'address[]', 'uint256[]', 'bool[]'], constructorArgs);
+
+
+            const deployedContract = await contract.deploy({
+              data: bytecode,
+              arguments: constructorArgs,
             }).send({
                 from: accounts[0],
-                gas: '5000000',
-                gasPrice: web3.utils.toWei('8', 'gwei'),
-              }, (error, transactionHash) => {
-                if (error) {
-                  console.error(error);
-                } else {
-                  console.log(transactionHash);
-                }
-              })
+                gas: finalGas,
+                gasPrice: gasPrice * 1.2 // 增加一个因子
+            }, (error, transactionHash) => {
+              if (error) {
+                console.error(error);
+              } else {
+                console.log(transactionHash);
+              }
+            })
 
             // 在区块链浏览器中验证
             const sourceCode = await web3.eth.getCode(deployedContract.options.address);
+            console.log("合约地址:",deployedContract.options.address);
+            console.log("源码:",sourceCode);
             const data = {
               apikey: 'CIFMXUC696VIJ1RZ3FERDUK3YKVT88JWKP',
               module: 'contract',
               action: 'verifysourcecode',
-              contractaddress: deployedContract.options.address,
               sourceCode: sourceCode,
+              contractaddress: deployedContract.options.address,
+              codeformat:'solidity-single-file',
+              contractname: 'CoinLockToken',
+              compilerversion: 'v0.8.4+commit.c7e474f2',
+              optimizationused:1,
+              runs:200,
+              constructorArguements: encodedArgs,
             };
             console.log(data)
-            const url = 'https://api-testnet.bscscan.com'
+            const url = 'https://api-testnet.bscscan.com/api'
             const response = await fetch(url, {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
               },
               body: JSON.stringify(data)
             });
-            const jsonResp = await response
-            console.log(jsonResp);
+            const resp = await response.json();
+            console.log(resp.result);
           } else if (isTemplates == 2) {
             console.log("prepare deploy", isTemplates)
             const abi = TemplateB_ABI;
